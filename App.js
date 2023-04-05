@@ -1,7 +1,8 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Weather from './components/Weather.js'
+import Weather from './components/Weather.js';
+import { weatherCoordinates } from './utils/WeatherCoordinates.js';
+
 
 export default class App extends React.Component {
   state = {
@@ -9,21 +10,17 @@ export default class App extends React.Component {
     temp: 0,
     snow: 0,
     weatherCode: 0,
-    error: null
   };
+  
 
   componentDidMount() {
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        this.fetchWeather(position.coords.latitude, position.coords.longitude);
-        // this.fetchWeather(46.85, -121.76)
-      },
-      error => {
-        this.setState({
-          error: 'Error Getting Weather'
-        });
-      }
-    );
+    const mountain = this.selectMountain();
+    this.fetchWeather(mountain.lat, mountain.lon)
+  }
+  
+  //update function to actually have user select which mountain forecast they want to view
+  selectMountain() {
+    return weatherCoordinates['crystal'];
   }
 
   fetchWeather(lat , lon) {
@@ -32,7 +29,7 @@ export default class App extends React.Component {
     )
     .then(res => res.json())
     .then(json => {
-      console.log(json.current_weather.weathercode);
+      console.log(json);
       this.setState({
         temp: json.current_weather.temperature,
         snow: json.hourly.snowfall[0],
