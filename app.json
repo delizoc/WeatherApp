@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "snow-app",
+    "slug": "snow-app",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "snow-app"
+}
