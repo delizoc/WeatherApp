@@ -10,6 +10,11 @@ export default class App extends React.Component {
     temp: 0,
     snow: 0,
     weatherCode: 0,
+    date: null,
+    tempMin: null,
+    tempMax: null,
+    snowTotal: null,
+    dailyWeatherCode: null,
   };
   
 
@@ -25,29 +30,39 @@ export default class App extends React.Component {
 
   fetchWeather(lat , lon) {
     fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,,snowfall&current_weather=true&temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch&timezone=America%2FLos_Angeles`
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=snowfall&daily=weathercode,temperature_2m_max,temperature_2m_min,snowfall_sum&current_weather=true&temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch&forecast_days=3&timezone=America%2FLos_Angeles`
+      // `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,,snowfall&current_weather=true&temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch&timezone=America%2FLos_Angeles`
     )
     .then(res => res.json())
     .then(json => {
       console.log(json);
+      // let array = json.daily.snowfall_sum;
+      // let sum = array.reduce(function(a, b){
+      //   return a + b;
+      // });
       this.setState({
         temp: json.current_weather.temperature,
-        snow: json.hourly.snowfall[0],
+        snow: json.daily.snowfall_sum[0],
         weatherCode: json.current_weather.weathercode,
+        date: json.daily.time,
+        tempMin: json.daily.temperature_2m_min,
+        tempMax: json.daily.temperature_2m_max,
+        snowTotal: json.daily.snowfall_sum,
+        dailyWeatherCode: json.daily.weathercode,
         isLoading: false
       });
     });
   }
 
   render() {
-    const { isLoading, temp, snow, weatherCode } = this.state;
+    const { isLoading, temp, snow, weatherCode, date, tempMin, tempMax, snowTotal, dailyWeatherCode } = this.state;
     return (
       <View style={styles.container}>
         {isLoading ? (
           <View style={styles.loadingContainer}>
             <Text style={styles.loadingText}>Fetching the Weather</Text>
           </View>
-        )  : <Weather temp={temp} snow={snow} weatherCode={weatherCode} /> }
+        )  : <Weather temp={temp} snow={snow} weatherCode={weatherCode} date={date} tempMin={tempMin} tempMax={tempMax} snowTotal={snowTotal} dailyCodes = {dailyWeatherCode} /> }
       </View>
     )
   }
